@@ -5,6 +5,7 @@ require("dotenv").config()
 const { initializeDatabase } = require("./db/initDb")
 const authRoutes = require("./routes/auth")
 const transactionRoutes = require("./routes/transactions")
+const reportsRoute = require("./routes/reports")
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -17,6 +18,7 @@ initializeDatabase() // ✅ Set up DB
 // ✅ Register routes
 app.use("/auth", authRoutes)
 app.use("/", transactionRoutes)
+app.use("/", reportsRoute)
 
 app.get("/", (req, res) => {
   res.send("User Auth API is running 🚀")

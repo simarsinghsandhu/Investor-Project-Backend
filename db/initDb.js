@@ -43,6 +43,44 @@ function initializeDatabase() {
         console.log("✅ Seeded 35 dummy transactions")
       }
     })
+
+    db.run(`
+      CREATE TABLE IF NOT EXISTS reports (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        url TEXT,
+        created_at TEXT
+      );
+    `)
+
+    db.get("SELECT COUNT(*) as count FROM reports", (err, row) => {
+      if (err) return console.error("Error checking reports count", err)
+
+      if (row.count === 0) {
+        const reports = [
+          ["Q2 2025 Report", "/pdfs/q2-2025.pdf", 0],
+          ["Q1 2025 Report", "/pdfs/q1-2025.pdf", 30],
+          ["Q4 2024 Report", "/pdfs/q4-2024.pdf", 90],
+          ["Q3 2024 Report", "/pdfs/q3-2024.pdf", 150],
+          ["Q2 2024 Report", "/pdfs/q2-2024.pdf", 210],
+          ["Q1 2024 Report", "/pdfs/q1-2024.pdf", 270],
+        ]
+
+        const stmt = db.prepare(
+          "INSERT INTO reports (name, url, created_at) VALUES (?, ?, ?)"
+        )
+
+        reports.forEach(([name, url, daysAgo]) => {
+          const createdAt = new Date(
+            Date.now() - daysAgo * 86400000
+          ).toISOString()
+          stmt.run(name, url, createdAt)
+        })
+
+        stmt.finalize()
+        console.log("✅ Seeded 6 dummy reports")
+      }
+    })
   })
 }
 
