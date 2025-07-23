@@ -15,8 +15,8 @@ app.use(express.json())
 initializeDatabase() // ✅ Set up DB
 
 // ✅ Register routes
-app.use("/api", authRoutes)
-app.use("/api", transactionRoutes)
+app.use("/auth", authRoutes)
+app.use("/", transactionRoutes)
 
 app.get("/", (req, res) => {
   res.send("User Auth API is running 🚀")

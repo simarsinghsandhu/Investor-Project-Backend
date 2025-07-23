@@ -18,10 +18,12 @@ router.get("/transactions", authenticateToken, (req, res) => {
       "SELECT id, date, amount, type, stock FROM transactions ORDER BY date DESC LIMIT ? OFFSET ?",
       [limit, offset],
       (err, rows) => {
-        if (err)
+        if (err) {
+          console.error("Database error:", err)
           return res
             .status(500)
             .json({ error: "Failed to retrieve transactions" })
+        }
         res.json({ transactions: rows, total })
       }
     )
