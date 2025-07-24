@@ -184,8 +184,8 @@ This project is a simple user authentication backend with SQLite database and JW
 ### Installation
 
 ```bash
-git clone https://github.com/your-username/your-repo.git
-cd your-repo
+git clone https://github.com/simarsinghsandhu/Investor-Project-Backend.git
+cd Investor-Project-Backend
 npm install
 ```
 
@@ -219,9 +219,9 @@ node server.js
 
 ## 📦 Future Improvements
 
-- Add user profile update API
+- Add user based crud operation for transactions
 - Add refresh token handling
-- Add file upload endpoint for reports
+- Add role_id to user table
 - Add unit and integration tests
 - Dockerize for production
 
