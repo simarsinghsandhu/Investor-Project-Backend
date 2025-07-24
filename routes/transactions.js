@@ -4,6 +4,7 @@ const { db } = require("../db/initDb")
 
 const router = express.Router()
 
+// Get paginated transactions
 router.get("/transactions", authenticateToken, (req, res) => {
   const page = parseInt(req.query.page) || 1
   const limit = parseInt(req.query.limit) || 10
@@ -27,6 +28,75 @@ router.get("/transactions", authenticateToken, (req, res) => {
         res.json({ transactions: rows, total })
       }
     )
+  })
+})
+
+// Create a new transaction
+router.post("/transactions", authenticateToken, (req, res) => {
+  const { date, amount, type, stock } = req.body
+
+  if (!date || !amount || !type || !stock) {
+    return res.status(400).json({ error: "Missing fields" })
+  }
+
+  const stmt = db.prepare(
+    "INSERT INTO transactions (date, amount, type, stock) VALUES (?, ?, ?, ?)"
+  )
+
+  stmt.run(date, amount, type, stock, function (err) {
+    if (err) {
+      console.error(err)
+      return res.status(500).json({ error: "Failed to add transaction" })
+    }
+
+    res.status(201).json({ id: this.lastID, date, amount, type, stock })
+  })
+
+  stmt.finalize()
+})
+
+// Update an existing transaction
+router.put("/transactions/:id", authenticateToken, (req, res) => {
+  const { id } = req.params
+  const { date, amount, type, stock } = req.body
+
+  if (!date || !amount || !type || !stock) {
+    return res.status(400).json({ error: "Missing fields" })
+  }
+
+  db.run(
+    "UPDATE transactions SET date = ?, amount = ?, type = ?, stock = ? WHERE id = ?",
+    [date, amount, type, stock, id],
+    function (err) {
+      if (err) {
+        console.error(err)
+        return res.status(500).json({ error: "Failed to update transaction" })
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({ error: "Transaction not found" })
+      }
+
+      res.json({ id, date, amount, type, stock })
+    }
+  )
+})
+
+// Delete a transaction
+router.delete("/transactions/:id", authenticateToken, (req, res) => {
+  const { id } = req.params
+
+  db.run("DELETE FROM transactions WHERE id = ?", [id], function (err) {
+    if (err) {
+      console.error(err)
+      return res.status(500).json({ error: "Failed to delete transaction" })
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ error: "Transaction not found" })
+    }
+
+    res.json({ message: "Transaction deleted", id })
   })
 })
 

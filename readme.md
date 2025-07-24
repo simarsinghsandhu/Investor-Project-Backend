@@ -1,168 +1,233 @@
-User Authentication and Transactions API
+# User Authentication and Transactions API
 
-This project is a simple user authentication backend with SQLite database and JWT token-based authorization. It includes APIs for user registration, login, and fetching paginated transaction data. The project is built with Node.js, Express, and SQLite.
-
----
-
-Features
-
-- User registration with hashed passwords (bcrypt)
-- User login with JWT token generation
-- JWT-protected transactions API with pagination
-- SQLite database with seeded dummy transactions
-- Modular project structure (routes, middleware, db initialization)
+This project is a simple user authentication backend with SQLite database and JWT token-based authorization. It includes APIs for user registration, login, transactions (CRUD), reports, and portfolio summary. The project is built with Node.js, Express, and SQLite.
 
 ---
 
-Technologies Used
+## 🌐 Hosted API
+
+**Base URL:**  
+[https://investor-project-backend.onrender.com](https://investor-project-backend.onrender.com)
+
+---
+
+## 🚀 Features
+
+- User registration & login with hashed passwords (bcrypt)
+- JWT-based authorization
+- CRUD operations for transactions (POST, PUT, GET, DELETE)
+- Reports to GET quarterly reports
+- Portfolio summary with total investment and individual investments and user info.
+- SQLite database with seeded data
+- Modular file structure (routes, middleware, DB init)
+
+---
+
+## 🛠 Technologies Used
 
 - Node.js
 - Express.js
 - SQLite3
 - bcryptjs
 - JSON Web Token (JWT)
-- dotenv
 - cors
 
 ---
 
-Getting Started
+## 🧾 API Endpoints
 
-Prerequisites
+### ✅ Auth
 
-- Node.js (v14+ recommended)
+- `POST /api/register`  
+  Register a new user  
+  **Request body:**
+
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "your_password"
+  }
+  ```
+
+  **Response:**
+
+  ```json
+  { "token": "jwt_token_here" }
+  ```
+
+- `POST /api/login`  
+  Login with email and password  
+  **Request body:**
+  ```json
+  {
+    "email": "user@example.com",
+    "password": "your_password"
+  }
+  ```
+  **Response:**
+  ```json
+  { "token": "jwt_token_here" }
+  ```
+
+---
+
+### 🔐 Transactions (JWT protected)
+
+- `GET /api/transactions`  
+  Fetch paginated transactions  
+  **Query Params:**
+
+  - `page` (optional)
+  - `limit` (optional)  
+    **Authorization:** `Bearer <token>`  
+    **Response:**
+
+  ```json
+  {
+    "transactions": [...],
+    "total": 35
+  }
+  ```
+
+- `POST /api/transactions`  
+  Create a new transaction  
+  **Request body:**
+
+  ```json
+  {
+    "stock": "AAPL",
+    "date": "2025-07-24T15:30",
+    "type": "deposit",
+    "amount": 100
+  }
+  ```
+
+- `PUT /api/transactions/:id`  
+  Update a transaction by ID  
+  **Request body:** (same as above)
+
+- `DELETE /api/transactions/:id`  
+  Delete a transaction by ID
+
+---
+
+### 📊 Portfolio Summary (JWT protected)
+
+- `GET /api/portfolio`  
+  Returns user info and stock-wise summary  
+  **Authorization:** `Bearer <token>`  
+  **Response:**
+  ```json
+  {
+    "user": {
+      "id": 1,
+      "email": "user@example.com"
+    },
+    "summary": {
+      "AAPL": 250,
+      "TSLA": 100
+    },
+    "totalInvestment": 350.0
+  }
+  ```
+
+---
+
+### 📁 Reports (JWT protected)
+
+- `GET /api/reports`  
+  Get a list of reports (name, URL, and creation date)  
+  **Authorization:** `Bearer <token>`  
+  **Response:**
+  ```json
+  {
+    "reports": [
+      {
+        "name": "report1.pdf",
+        "url": "https://example.com/report1.pdf",
+        "created_at": "2025-07-22T10:00:00Z"
+      }
+    ]
+  }
+  ```
+
+---
+
+## 🧱 Project Structure
+
+```
+.
+├── db/
+│   └── initDb.js           # Database setup and dummy seeding
+├── middleware/
+│   └── authMiddleware.js   # JWT authentication middleware
+├── routes/
+│   ├── auth.js             # Register & login routes
+│   ├── transactions.js     # CRUD transactions
+│   ├── reports.js          # Reports route
+│   └── portfolio.js        # Portfolio summary
+├── server.js               # Main server entry
+├── db.sqlite               # SQLite DB file (auto-generated)
+├── .env                    # Environment variables
+└── package.json
+```
+
+---
+
+## ⚙️ Getting Started
+
+### Prerequisites
+
+- Node.js (v14+)
 - npm or yarn
 
-Installation
+### Installation
 
-1. Clone the repo:
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+npm install
+```
 
-   git clone https://github.com/your-username/your-repo.git
-   cd your-repo
+### Environment Setup
 
-2. Install dependencies:
+Create a `.env` file in the root directory:
 
-   npm install
+```
+PORT=5000
+JWT_SECRET=your_jwt_secret
+```
 
-3. Create a `.env` file in the root directory and add:
+### Run Server
 
-   PORT=5000
-   JWT_SECRET=your_jwt_secret
+```bash
+node server.js
+```
 
-4. Start the server:
-
-   node server.js
-
-5. Server will run on: http://localhost:5000
-
----
-
-API Endpoints
-
-Auth
-
-- POST /api/register
-
-  Register a new user.
-
-  Request body:
-
-  {
-  "email": "user@example.com",
-  "password": "your_password"
-  }
-
-  Response:
-
-  {
-  "token": "jwt_token_here"
-  }
-
-- POST /api/login
-
-  Login with email and password.
-
-  Request body:
-
-  {
-  "email": "user@example.com",
-  "password": "your_password"
-  }
-
-  Response:
-
-  {
-  "token": "jwt_token_here"
-  }
-
-Transactions (Protected, requires Authorization header with Bearer token)
-
-- GET /api/transactions
-
-  Get paginated transactions.
-
-  Query parameters:
-
-  - page (optional) - page number (default: 1)
-  - limit (optional) - number of transactions per page (default: 10)
-
-  Response:
-
-  {
-  "transactions": [
-  {
-  "id": 1,
-  "date": "2025-07-22T12:34:56.789Z",
-  "amount": 75.50,
-  "type": "deposit",
-  "stock": "AAPL"
-  },
-  ...
-  ],
-  "total": 35
-  }
+> Server will run at: `http://localhost:5000`
 
 ---
 
-Project Structure
+## 🔐 Notes
 
-.
-├── controllers/ # (optional) Controllers if used
-├── db/
-│ └── initDb.js # DB setup and seeding
-├── middleware/
-│ └── authMiddleware.js # JWT authentication middleware
-├── routes/
-│ ├── auth.js # Auth routes (register, login)
-│ └── transactions.js # Transactions route
-├── server.js # Main Express server entry
-├── db.sqlite # SQLite DB file (auto-created)
-├── .env # Environment variables
-└── package.json
+- Passwords are securely hashed using `bcrypt`
+- Tokens are signed using secret in `.env`
+- Transactions table is pre-seeded with 35 entries
+- All protected routes require `Authorization: Bearer <token>`
 
 ---
 
-Notes
+## 📦 Future Improvements
 
-- Passwords are hashed using bcrypt with salt rounds of 8.
-- JWT tokens are signed with the secret defined in `.env`.
-- Transactions table is seeded with 35 dummy entries on first run.
-- Transactions API is protected and requires a valid JWT token in the Authorization header.
-- You can customize seeding data and database path in `initDb.js`.
-
----
-
-Future Improvements
-
-- Add user profile management.
-- Implement refresh tokens.
-- Add APIs to create new transactions.
-- Add unit/integration tests.
-- Dockerize the app for easier deployment.
+- Add user profile update API
+- Add refresh token handling
+- Add file upload endpoint for reports
+- Add unit and integration tests
+- Dockerize for production
 
 ---
 
-License
+## 📄 License
 
 MIT License © Simar Singh Sandhu
 
