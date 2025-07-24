@@ -31,16 +31,33 @@ function initializeDatabase() {
 
         const stocks = ["AAPL", "TSLA", "GOOGL", "AMZN", "MSFT", "NFLX", "META"]
 
+        // Track balance per stock
+        const balances = {}
+
         for (let i = 0; i < 35; i++) {
           const date = new Date(Date.now() - i * 86400000).toISOString()
-          const amount = (Math.random() * 100).toFixed(2)
-          const type = Math.random() > 0.5 ? "deposit" : "withdraw"
           const stock = stocks[Math.floor(Math.random() * stocks.length)]
+          const amount = parseFloat((Math.random() * 100).toFixed(2))
+
+          // Initialize balance if not exists
+          if (!balances[stock]) balances[stock] = 0
+
+          let type
+
+          // Only allow withdraw if enough balance exists
+          if (balances[stock] >= amount && Math.random() > 0.5) {
+            type = "withdraw"
+            balances[stock] -= amount
+          } else {
+            type = "deposit"
+            balances[stock] += amount
+          }
+
           stmt.run(date, amount, type, stock)
         }
 
         stmt.finalize()
-        console.log("✅ Seeded 35 dummy transactions")
+        console.log("✅ Seeded 35 valid transactions (no over-withdrawals)")
       }
     })
 

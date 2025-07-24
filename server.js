@@ -6,6 +6,7 @@ const { initializeDatabase } = require("./db/initDb")
 const authRoutes = require("./routes/auth")
 const transactionRoutes = require("./routes/transactions")
 const reportsRoute = require("./routes/reports")
+const portfolioRoute = require("./routes/portfolio")
 
 const app = express()
 const PORT = process.env.PORT || 5000
@@ -19,6 +20,7 @@ initializeDatabase() // ✅ Set up DB
 app.use("/auth", authRoutes)
 app.use("/", transactionRoutes)
 app.use("/", reportsRoute)
+app.use("/", portfolioRoute)
 
 app.get("/", (req, res) => {
   res.send("User Auth API is running 🚀")
