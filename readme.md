@@ -38,7 +38,7 @@ This project is a simple user authentication backend with SQLite database and JW
 
 ### ✅ Auth
 
-- `POST /api/register`  
+- `POST /api/auth/register`  
   Register a new user  
   **Request body:**
 
@@ -55,7 +55,7 @@ This project is a simple user authentication backend with SQLite database and JW
   { "token": "jwt_token_here" }
   ```
 
-- `POST /api/login`  
+- `POST /api/auth/login`  
   Login with email and password  
   **Request body:**
   ```json
